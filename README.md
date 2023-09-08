@@ -4,14 +4,14 @@ Welcome to the data analysis repository for the manuscript 'IFN-γ-Stat1 Axis Dr
 
 In this repository, you will find two main code folders, each dedicated to a specific type of data analysis performed in the manuscript.
 
-**1. Bulk RNA Sequencing Analysis (bulkRNAseq):**
+**1. Bulk_RNA_sequencing_analysis (bulkRNAseq):**
    - This folder contains essential scripts for analyzing bulk RNA sequencing data.
    - **RNAseqpipeline R Script:** Used for processing and analyzing bulk RNA sequencing data.
    - **pipeline_RNA-seq Perl Code:** This code is launched by the RNAseqpipeline for specific tasks.
    - **GeneSetBoxPlot R Script:** Utilized for gene set enrichment analysis.
    - **bulkRNAseq_IntestineEpithelial_VivoVitro.R:** Responsible for bulk RNA sequencing analysis of intestine crypts and organoids, contributing to figures 1, 2, S1, and S2 in the manuscript.
 
-**2. Single-Cell RNA Sequencing Analysis (scRNAseq):**
+**2. Single_cell_RNA_sequencing_analysis (scRNAseq):**
    - In this folder, you'll find R scripts tailored for single-cell RNA sequencing analysis.
    - **scRNAseq_IntestineEpithelial_InVivo.R:** Analyzing single-cell RNA sequencing data from intestine crypts during aging, contributing to figures 3, 7, and S3.
    - **scRNAseq_IntestineEpithelial_Organoids.R:** Analyzing single-cell RNA sequencing data from intestine organoids upon IFN-γ treatment, contributing to figures 3, 5, 7, S4, and S6.
