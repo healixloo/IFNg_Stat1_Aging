@@ -19,7 +19,7 @@ In this repository, you will find two main code folders, each dedicated to a spe
    - **Stat1_Identification.R:** Focused on identifying Stat1 regulators in the IFN-γ-driven pathway, contributing to figure 7.
 
 **Data Directories:**
-   - The 'data' and 'data_out' folders contain input processed data used in the analysis scripts.
+   - The 'data' and 'data_out' folders contain input and output processed data used in the analysis scripts.
    - BulkRNAseq data: Generated using an in-house RNAseq pipeline detailed in the 'Bulk RNA Sequencing Analysis' folder.
    - scRNAseq data: Processed using The Cell Ranger Software Suite (Version 3.1.0).
 
