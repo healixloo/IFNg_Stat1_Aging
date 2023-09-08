@@ -1,0 +1,93 @@
+© 2000-2020 QIAGEN. All rights reserved.
+
+Ingenuity Canonical Pathways	 -log(p-value)	Ratio	z-score	Molecules	
+MIF-mediated Glucocorticoid Regulation	3.97E00	8.82E-02	NaN	CD74,PLA2G2F,PLA2G5	
+MIF Regulation of Innate Immunity	3.69E00	7.14E-02	NaN	CD74,PLA2G2F,PLA2G5	
+MSP-RON Signaling Pathway	2.96E00	4.05E-02	NaN	CCR2,IL3RA,ITGAM	
+Fc Epsilon RI Signaling	2.3E00	2.36E-02	NaN	FYN,PLA2G2F,PLA2G5	
+Atherosclerosis Signaling	2.29E00	2.34E-02	NaN	CCR2,PLA2G2F,PLA2G5	
+Glutamate Dependent Acid Resistance	2.26E00	5E-01	NaN	GAD2	
+Neuroinflammation Signaling Pathway	1.98E00	1.28E-02	0.000	GAD2,P2RX7,PLA2G2F,PLA2G5	
+Phospholipases	1.89E00	3.17E-02	NaN	PLA2G2F,PLA2G5	
+Glutamate Degradation III (via 4-aminobutyrate)	1.87E00	2E-01	NaN	GAD2	
+Eicosanoid Signaling	1.83E00	2.94E-02	NaN	PLA2G2F,PLA2G5	
+Caveolar-mediated Endocytosis Signaling	1.79E00	2.82E-02	NaN	FYN,ITGAM	
+Pyruvate Fermentation to Lactate	1.79E00	1.67E-01	NaN	LDHB	
+Glycine Cleavage Complex	1.79E00	1.67E-01	NaN	AMT	
+ERK/MAPK Signaling	1.74E00	1.46E-02	NaN	FYN,PLA2G2F,PLA2G5	
+Role of MAPK Signaling in the Pathogenesis of Influenza	1.71E00	2.53E-02	NaN	PLA2G2F,PLA2G5	
+VEGF Family Ligand-Receptor Interactions	1.55E00	2.08E-02	NaN	PLA2G2F,PLA2G5	
+Phospholipase C Signaling	1.54E00	1.23E-02	NaN	FYN,PLA2G2F,PLA2G5	
+Antioxidant Action of Vitamin C	1.45E00	1.83E-02	NaN	PLA2G2F,PLA2G5	
+Type I Diabetes Mellitus Signaling	1.43E00	1.8E-02	NaN	GAD2,PTPRN	
+p38 MAPK Signaling	1.39E00	1.69E-02	NaN	PLA2G2F,PLA2G5	
+Sperm Motility	1.32E00	1.56E-02	NaN	PLA2G2F,PLA2G5	
+Inflammasome pathway	1.27E00	5E-02	NaN	P2RX7	
+CCR3 Signaling in Eosinophils	1.27E00	1.46E-02	NaN	PLA2G2F,PLA2G5	
+Insulin Receptor Signaling	1.22E00	1.36E-02	NaN	FYN,GRB10	
+Inhibition of Angiogenesis by TSP1	1.05E00	2.94E-02	NaN	FYN	
+Synaptic Long Term Depression	1.04E00	1.08E-02	NaN	PLA2G2F,PLA2G5	
+Complement System	1.02E00	2.7E-02	NaN	ITGAM	
+Antigen Presentation Pathway	1.01E00	2.63E-02	NaN	CD74	
+Endothelin-1 Signaling	9.91E-01	1.01E-02	NaN	PLA2G2F,PLA2G5	
+3-phosphoinositide Biosynthesis	9.79E-01	9.9E-03	NaN	FYN,PTPRN	
+Osteoarthritis Pathway	9.47E-01	9.48E-03	NaN	DDR2,P2RX7	
+Integrin Signaling	9.14E-01	9.05E-03	NaN	FYN,ITGAM	
+Semaphorin Signaling in Neurons	8.7E-01	1.89E-02	NaN	FYN	
+Superpathway of Inositol Phosphate Compounds	8.66E-01	8.44E-03	NaN	FYN,PTPRN	
+Retinoic acid Mediated Apoptosis Signaling	8.07E-01	1.61E-02	NaN	PARP3	
+Ephrin A Signaling	8.07E-01	1.61E-02	NaN	FYN	
+Pyridoxal 5'-phosphate Salvage Pathway	7.88E-01	1.54E-02	NaN	DAPK1	
+Regulation of IL-2 Expression in Activated and Anergic T Lymphocytes	6.8E-01	1.16E-02	NaN	FYN	
+Leptin Signaling in Obesity	6.7E-01	1.14E-02	NaN	GHRL	
+Crosstalk between Dendritic Cells and Natural Killer Cells	6.66E-01	1.12E-02	NaN	IL3RA	
+IL-3 Signaling	6.62E-01	1.11E-02	NaN	IL3RA	
+Prolactin Signaling	6.58E-01	1.1E-02	NaN	FYN	
+Fcγ Receptor-mediated Phagocytosis in Macrophages and Monocytes	6.54E-01	1.09E-02	NaN	FYN	
+Death Receptor Signaling	6.5E-01	1.08E-02	NaN	PARP3	
+TGF-β Signaling	6.5E-01	1.08E-02	NaN	AMHR2	
+IL-7 Signaling Pathway	6.5E-01	1.08E-02	NaN	FYN	
+Reelin Signaling in Neurons	6.44E-01	1.06E-02	NaN	FYN	
+Bladder Cancer Signaling	6.44E-01	1.06E-02	NaN	DAPK1	
+GABA Receptor Signaling	6.4E-01	1.05E-02	NaN	GAD2	
+Salvage Pathways of Pyrimidine Ribonucleotides	6.33E-01	1.03E-02	NaN	DAPK1	
+CTLA4 Signaling in Cytotoxic T Lymphocytes	6.18E-01	9.9E-03	NaN	FYN	
+FAK Signaling	5.95E-01	9.35E-03	NaN	FYN	
+Oxidative Phosphorylation	5.88E-01	9.17E-03	NaN	COX6B2	
+UVA-Induced MAPK Signaling	5.75E-01	8.85E-03	NaN	PARP3	
+IGF-1 Signaling	5.75E-01	8.85E-03	NaN	GRB10	
+T Cell Receptor Signaling	5.62E-01	8.55E-03	NaN	FYN	
+Virus Entry via Endocytic Pathways	5.59E-01	8.47E-03	NaN	FYN	
+Neuroprotective Role of THOP1 in Alzheimer's Disease	5.53E-01	8.33E-03	NaN	HPN	
+Paxillin Signaling	5.5E-01	8.26E-03	NaN	ITGAM	
+HIF1α Signaling	5.35E-01	7.94E-03	NaN	LDHB	
+Natural Killer Cell Signaling	5.24E-01	7.69E-03	NaN	FYN	
+Role of Tissue Factor in Cancer	5.19E-01	7.58E-03	NaN	FYN	
+STAT3 Pathway	5.19E-01	7.58E-03	NaN	IL3RA	
+Phagosome Formation	5.19E-01	7.58E-03	NaN	ITGAM	
+CD28 Signaling in T Helper Cells	5.13E-01	7.46E-03	NaN	FYN	
+Adipogenesis pathway	5.13E-01	7.46E-03	NaN	DLK1	
+PI3K Signaling in B Lymphocytes	5.1E-01	7.41E-03	NaN	FYN	
+GP6 Signaling Pathway	5.1E-01	7.41E-03	NaN	FYN	
+D-myo-inositol (1,4,5,6)-Tetrakisphosphate Biosynthesis	4.87E-01	6.94E-03	NaN	PTPRN	
+D-myo-inositol (3,4,5,6)-tetrakisphosphate Biosynthesis	4.87E-01	6.94E-03	NaN	PTPRN	
+Gustation Pathway	4.63E-01	6.49E-03	NaN	P2RX7	
+3-phosphoinositide Degradation	4.55E-01	6.33E-03	NaN	PTPRN	
+D-myo-inositol-5-phosphate Metabolism	4.46E-01	6.17E-03	NaN	PTPRN	
+PKCθ Signaling in T Lymphocytes	4.35E-01	5.99E-03	NaN	FYN	
+Mitochondrial Dysfunction	4.27E-01	5.85E-03	NaN	COX6B2	
+Tec Kinase Signaling	4.27E-01	5.85E-03	NaN	FYN	
+Wnt/β-catenin Signaling	4.25E-01	5.81E-03	NaN	SOX12	
+Ephrin Receptor Signaling	4.16E-01	5.65E-03	NaN	FYN	
+Granulocyte Adhesion and Diapedesis	4.1E-01	5.56E-03	NaN	ITGAM	
+RAR Activation	3.91E-01	5.26E-03	NaN	IL3RA	
+Role of NFAT in Regulation of the Immune Response	3.86E-01	5.18E-03	NaN	FYN	
+Dendritic Cell Maturation	3.82E-01	5.1E-03	NaN	DDR2	
+IL-8 Signaling	3.69E-01	4.9E-03	NaN	ITGAM	
+Leukocyte Extravasation Signaling	3.55E-01	4.69E-03	NaN	ITGAM	
+Opioid Signaling Pathway	3.09E-01	4.07E-03	NaN	FYN	
+G-Protein Coupled Receptor Signaling	2.68E-01	3.53E-03	NaN	FYN	
+Sirtuin Signaling Pathway	2.59E-01	3.42E-03	NaN	LDHB	
+Axonal Guidance Signaling	-0E00	2.01E-03	NaN	FYN	
+Molecular Mechanisms of Cancer	-0E00	2.54E-03	NaN	FYN	
+Protein Kinase A Signaling	-0E00	2.51E-03	NaN	PTPRN	

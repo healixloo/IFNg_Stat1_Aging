@@ -1,0 +1,13 @@
+FileName,SampleName,Group,GroupPriority
+498_Con.fastq,498_Con,Con,1
+499_Con.fastq,499_Con,Con,1
+500_Con.fastq,500_Con,Con,1
+501_Con.fastq,501_Con,Con,1
+498_Ifng.fastq,498_Ifng,Ifng,2
+499_Ifng.fastq,499_Ifng,Ifng,2
+500_Ifng.fastq,500_Ifng,Ifng,2
+501_Ifng.fastq,501_Ifng,Ifng,2
+498_Nrn1.fastq,498_Nrn1,Nrn1,3
+499_Nrn1.fastq,499_Nrn1,Nrn1,3
+500_Nrn1.fastq,500_Nrn1,Nrn1,3
+501_Nrn1.fastq,501_Nrn1,Nrn1,3

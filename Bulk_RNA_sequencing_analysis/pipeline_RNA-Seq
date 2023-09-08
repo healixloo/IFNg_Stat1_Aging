@@ -1,0 +1,127 @@
+#!/usr/bin/perl
+
+##
+# Pipeline_RNA-Seq (v0.1)
+# Epigenetics Unit @ HuGeF [Human Genetics Foundation]
+#
+# Author:  Dr. Danny Incarnato (danny.incarnato[at]hugef-torino.org)
+##
+
+use strict;
+use Getopt::Long;
+
+$|++;
+
+my (%files, @pids, $path,
+    $genome, $p, $bowtien);
+
+$p = 4;
+$genome = "mm9";
+
+do {
+    
+    local $SIG{__WARN__} = sub { };
+
+    GetOptions( "g|genome=s"    => \$genome,
+                "p|threads=i" => \$p,
+                "n|bowtie-n" => \$bowtien ) or help();
+
+    $path = $ARGV[0];
+
+};
+
+die "\n  [!] Error: Please specify a valid path to FastQ files\n\n" if (!defined $path ||
+                                                                        !-d $path);
+die "\n  [!] Error: Invalid genome (must be \"hg19\", \"mm9\", \"rn5\", or \"sl2.50\")\n\n" if ($genome !~ m/^hg19|mm9|rn5|sl2.50$/);
+
+$path =~ s/\/$//;
+
+print "\n[+] Listing FastQ files...\n";
+
+opendir(my $dh, $path);
+while (my $file = readdir($dh)) {
+
+    if ($file =~ m/^(.+?)(.fq|.fastq)$/) {
+    
+        my $name = $1;
+        $files{$name} = $path . "/" . $file;
+        
+        print "\n  [*] " . $file;
+    
+    }
+
+}
+closedir($dh);
+
+die "\n\n  [!] No FastQ file was found inside \"" . $path . "\"\n\n" if (!keys(%files));
+
+print "\n\n[+] Starting Tophat reads mapping...\n\n";
+
+foreach my $name (keys %files) {
+
+    my $pid = fork || exec "tophat --bowtie1 --no-coverage-search " . ($bowtien ? "--bowtie-n " : " ") . "-o " . $path . "/" . $name . " -a 5 -p " . $p . " /data/datasets/indexes/bowtie/" . $genome . "/" . $genome . " " . $files{$name};
+    push(@pids, $pid);
+    
+}
+
+waitpid($_, 0) for (@pids);
+@pids = ();
+
+print "\n[+] Making TDF files...";
+
+foreach my $name (keys %files) {
+    
+    my $pid = fork || exec "cd " . $path . "/" . $name . " && " .
+                           "makenormtdf accepted_hits.bam " . $genome . " " . $name . ".tdf " . $name;
+    push(@pids, $pid);
+  
+}
+
+waitpid($_, 0) for (@pids);
+@pids = ();
+
+print "\n[+] Moving files in place...";
+
+foreach my $name (keys %files) {
+    
+    my $pid = fork || exec "mv " . $path . "/" . $name . ".* " . $path . "/" . $name . "/";
+    push(@pids, $pid);
+    
+}
+
+waitpid($_, 0) for (@pids);
+@pids = ();
+
+my ($cuffdiff);
+$cuffdiff .= " " . $path . "/" . $_ . "/accepted_hits.bam" for (sort keys %files);
+
+print "\n[+] Executing CuffDiff...";
+
+print "\n\n  [-] Cuffdiff files order: " . $cuffdiff . "\n";
+
+system("cuffdiff -o " . $path . "/cuffdiff/ -p " . $p . " -T --library-norm-method quartile --total-hits-norm /data/datasets/annotations/cufflinks/" . $genome . "/reference.gtf " . $cuffdiff);
+
+print "\n\n[+] All done.\n\n";
+
+sub help {
+    
+    die <<HELP;
+ 
+ Pipeline_RNA-Seq (v0.1)
+ Epigenetics Units @ HuGeF [Human Genetics Foundation]
+ Group leader: Prof. Salvatore Oliviero
+    
+ Author:  Dr. Danny Incarnato (danny.incarnato[at]hugef-torino.org)
+ Summary: Automatic reads mapping, WIG generation, and differential expression from FastQ files
+ 
+ Usage:   pipeline_RNA-Seq [Options] <path_to_FastQ(s)>
+ 
+ Options                                Description
+ -g  or --genome                        Genome reference for reads mapping (hg19, mm9 (default), rn5, or sl2.50)
+ -p  or --threads                       Number of processors to use for Tophat mapping (default: 4)
+ -n  or --bowtie-n                      Use Bowtie -n mapping mode (Default: -v)
+ 
+HELP
+    
+}
+

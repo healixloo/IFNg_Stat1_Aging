@@ -1,0 +1,15 @@
+"","celltype_new","treatment","celltypes_sum","celltypes_sum_ratio","treatment_sum"
+"1","Enterocyte","Control",1463,0.250385076159507,5843
+"2","Enterocyte-Prog","Control",1484,0.253979120314907,5843
+"3","Enteroendocrine","Control",236,0.0403902105083005,5843
+"4","Goblet-Paneth","Control",222,0.0379941810713674,5843
+"5","Stem","Control",764,0.130754749272634,5843
+"6","TA","Control",1607,0.275029950367962,5843
+"7","Tuft","Control",67,0.0114667123053226,5843
+"8","Enterocyte","Ifng",1308,0.1813895437526,7211
+"9","Enterocyte-Prog","Ifng",2023,0.280543613923173,7211
+"10","Enteroendocrine","Ifng",524,0.0726667591180142,7211
+"11","Goblet-Paneth","Ifng",448,0.0621273055054777,7211
+"12","Stem","Ifng",318,0.0440992927471918,7211
+"13","TA","Ifng",2428,0.336707807516295,7211
+"14","Tuft","Ifng",162,0.0224656774372486,7211

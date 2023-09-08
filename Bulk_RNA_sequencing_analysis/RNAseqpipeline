@@ -1,0 +1,328 @@
+#! /misc/leiron/biosw/bin/Rscript
+
+# RNA seq pipeline
+#libraries
+if("DESeq2" %in% rownames(installed.packages()) == FALSE){
+	source("https://bioconductor.org/biocLite.R")
+biocLite("DESeq2")
+}
+
+if("parallel" %in% rownames(installed.packages()) == FALSE){
+	install.packages("parallel",repos='http://cran.us.r-project.org')}
+
+if("pheatmap" %in% rownames(installed.packages()) == FALSE){
+	install.packages("pheatmap",repos='http://cran.us.r-project.org')}
+
+if("ggplot2" %in% rownames(installed.packages()) == FALSE){
+	install.packages("ggplot2",repos='http://cran.us.r-project.org')}
+	
+if("RColorBrewer" %in% rownames(installed.packages()) == FALSE){
+	install.packages("RColorBrewer",repos='http://cran.us.r-project.org')}
+library(DESeq2)
+library(parallel)
+library(pheatmap)
+library(ggplot2)
+library("RColorBrewer")
+#Constat files or values
+sampleSheet<-"SampleSheet.csv"
+ss<-read.csv(sampleSheet)
+l<-list.files(pattern=".fastq")
+if (! all(ss$FileName %in% l)) {stop("Sample Sheet and fastq files do not match!!")}
+ss$FileName<-gsub(".fastq","",ss$FileName)
+sor<-read.csv("/data/datasets/annotations/mm9/GeneSources.csv")
+rem<-c("Lars2","Gm15564","AC113316,1","AY036118","mt-Rnr2","mt-Rnr1","__alignment_not_unique","__ambiguous","__no_feature","__not_aligned","__too_low_aQual") #rows which should remove from counts
+#mapping with rRNA
+
+dir.create("rRNA")
+dir.create("Results")
+system("for i in *.fastq; do tophat -p 4 --max-multihits=10000  --bowtie1 -o rRNA/$i /data/datasets/indexes/bowtie/mm9_rRNA/mm9rRNA $i & done",wait=TRUE,intern =TRUE)
+
+#reading the % reads maped to rRNA
+lr<-list.files("./rRNA")
+rRna<-data.frame(SampleName=NULL,rRNA=NULL)
+for (i in lr){
+	l<-paste("./rRNA/",i,"/align_summary.txt",sep="")
+	a<-read.table(l,fill=TRUE,sep=c("("),header=FALSE,stringsAsFactor=FALSE)
+	a<-as.numeric(strsplit(a$V2[3],"%")[[1]][1])
+	rRna<-rbind(rRna,data.frame(SampleName=i,rRNA=a))
+}
+rRna$SampleName<-gsub(".fastq","",rRna$SampleName)
+write.csv(rRna,"./Results/rRNA.csv")
+
+pdf("./Results/rRNA.pdf")
+par(mai=c(1,2,1,1))
+barplot(rRna$rRNA,names.arg = rRna$SampleName, horiz=TRUE,cex.names=0.7,las=1,xlab="% rRNA")
+dev.off()
+
+#system("rm -r rRNA")
+
+#running pipeline_RNAseq
+system ("pipeline_RNA-Seq -g mm9 ./" ,wait=TRUE,intern =TRUE )
+
+#reading the % mapped reads to the genome
+
+maped<-data.frame(SampleName=NULL,Mapped=NULL,MultipleAlignment=NULL)
+for (i in 1:nrow(ss)){
+	l<-paste(ss$FileName[i],"/align_summary.txt",sep="")
+	a<-read.table(l,fill=TRUE,sep=c("("),header=FALSE,stringsAsFactor=FALSE)
+	mp<-as.numeric(strsplit(a$V2[3],"%")[[1]][1])
+	ma<-as.numeric(strsplit(a$V2[4],"%")[[1]][1])
+	
+	maped<-rbind(maped,data.frame(SampleName=ss$SampleName[i],Mapped=mp,MultipleAlignment=ma))
+}
+
+write.csv(maped,"./Results/MappingPercentage.csv")
+
+pdf("./Results/MappingPercentage.pdf")
+par(mai=c(1,2,1,1))
+barplot(maped$Mapped,names.arg = maped$SampleName, horiz=TRUE,cex.names=0.7,las=1,xlab="% mapped reads",xlim=c(0,100))
+dev.off()
+
+#making csv file for fpkm
+system("diff2csv cuffdiff/gene_exp.diff > cuffdiff/gene_exp.csv",wait=TRUE,intern =TRUE)
+system("diff2csv cuffdiff/isoform_exp.diff > cuffdiff/isoform_exp.csv",wait=TRUE,intern =TRUE)
+
+r<-read.table("cuffdiff/read_groups.info",header=TRUE)
+r<-gsub("\\./","",r$file)
+r<-gsub("/accepted_hits\\.bam","",r)
+a<-read.csv("cuffdiff/gene_exp.csv",header=FALSE,sep=";")
+
+fpkm<-data.frame(a$V1,a$V2,a$V4)
+for (i in 2:length(r)){
+	s<-(i-1)*5
+	fpkm<-cbind(fpkm,a[,s])
+}
+
+colnames(fpkm)<-c("Gene","Pos",r)
+
+write.csv(fpkm,"./Results/Gene_exp_FPKM.csv",row.names=FALSE)
+
+a<-read.csv("cuffdiff/isoform_exp.csv",header=FALSE,sep=";")
+
+fpkm<-data.frame(a$V1,a$V2,a$V4)
+for (i in 2:length(r)){
+	s<-(i-1)*5
+	fpkm<-cbind(fpkm,a[,s])
+}
+
+colnames(fpkm)<-c("Isoform","Pos",r)
+
+write.csv(fpkm,"./Results/Isoform_exp_FPKM.csv",row.names=FALSE)
+
+####################
+
+
+
+#htseq count
+dir.create("HTseqCount")
+
+
+htseq<-function(i){
+	system(paste("htseq-count -q -f bam -r pos -s no -a 0 -t exon -i gene_id -m intersection-nonempty ", i,"/accepted_hits.bam ", " /data/datasets/annotations/cufflinks/mm9/full_annotation.gtf > "," HTseqCount/", i,".txt",sep=""),wait=TRUE,intern =TRUE)
+}
+
+cl<-makeCluster(nrow(ss))
+parLapply(cl,ss$FileName,htseq)
+stopCluster(cl)
+
+#removing unrelated counts(rRNA,etc.)
+
+ls<-list.files("./HTseqCount")
+for (l in ls){
+	a<-read.table(paste("./HTseqCount/",l,sep=""))
+	a<-a[! a$V1 %in% rem,]
+	f<-gsub(".txt","",l)
+	write.table(a,paste("./HTseqCount/",f,"_trimed.txt",sep=""),sep="\t",col.names=FALSE,row.names=FALSE,quote=FALSE)
+}
+# Deseq2
+
+sampleTable <- data.frame(sampleName = ss$SampleName,
+                          fileName = paste(ss$FileName,"_trimed.txt",sep=""),
+                          condition = ss$Group)
+dds <- DESeqDataSetFromHTSeqCount(sampleTable = sampleTable,
+                                       directory = "./HTseqCount",
+                                       design= ~ condition)
+dds$condition <- relevel(dds$condition, as.character(ss[ss$GroupPriority==1,"Group"][1]))
+dds$condition <- droplevels(dds$condition)
+dds <- DESeq(dds)
+res <- results(dds)
+#for more than 2 groups
+Deseq<-function(g){
+sampleTable <- data.frame(sampleName = ss[ss$GroupPriority %in% g,"SampleName"],
+                          fileName = paste(ss[ss$GroupPriority %in% g,"FileName"],"_trimed.txt",sep=""),
+                          condition = droplevels(ss[ss$GroupPriority %in% g,"Group"]))
+dds <- DESeqDataSetFromHTSeqCount(sampleTable = sampleTable,
+                                       directory = "./HTseqCount",
+                                       design= ~ condition)
+dds$condition <- relevel(dds$condition, as.character(ss[ss$GroupPriority==g[1],"Group"][1]))
+dds$condition <- droplevels(dds$condition)
+dds <- DESeq(dds)
+res <- results(dds)
+write.csv(res,paste("./Results/Deseq2_AllGenes_",levels(dds$condition)[1],"VS",levels(dds$condition)[2],".csv",sep=""))
+#seperating different RNA sources
+
+for (i in levels(sor$Source)){
+  g<-sor[sor$Source==i,"GeneName"]
+  sg<-res[rownames(res) %in% g,]
+write.csv(sg,paste("./Results/Deseq2_",i,"_",levels(dds$condition)[1],"VS",levels(dds$condition)[2],".csv",sep=""))
+  }
+	
+}
+
+if (length(levels(ss$Group))>2) {
+for(i in 1:(length(levels(ss$Group))-1)) {
+	for (j in (i+1):(length(levels(ss$Group)))){
+Deseq(c(i,j)) 
+}
+}
+	
+} else {
+	
+write.csv(res,"./Results/Deseq2_AllGenes.csv")
+#seperating different RNA sources
+
+for (i in levels(sor$Source)){
+  g<-sor[sor$Source==i,"GeneName"]
+  sg<-res[rownames(res) %in% g,]
+write.csv(sg,paste("./Results/Deseq2_",i,".csv",sep=""))
+  }
+}
+
+count<-counts(dds,normalized=TRUE)
+write.csv(count,"./Results/Counts_norm_DESeq2_AllGenes.csv")
+
+for (i in levels(sor$Source)){
+  g<-sor[sor$Source==i,"GeneName"]
+  sg<-count[rownames(count) %in% g,]
+  write.csv(sg,paste("./Results/Counts_norm_DESeq2_",i,".csv",sep=""))
+}
+
+#percentage of RNA sources
+uncount<-counts(dds)
+sumcount<-data.frame(Sample=colnames(uncount),TotalCount=NA)
+for (i in 1:ncol(uncount)){
+  s<-sum(uncount[,i])
+  sumcount$TotalCount[i]<-s
+}
+
+
+countRes<-uncount[0,]
+for (i in levels(sor$Source)){
+  g<-sor[sor$Source==i,"GeneName"]
+  sg<-uncount[rownames(uncount) %in% g,]
+  sum<-apply(sg,2,sum)
+  normsum<-100*sum/sumcount$TotalCount
+  countRes<-rbind(countRes,normsum)
+  rownames(countRes)[nrow(countRes)]<-i
+}
+write.csv(countRes,"./Results/CountSorces_allSamples.csv")
+
+# average of Pecentage of reads in each source per group
+groupcount<-data.frame(GeneSources=rownames(countRes))
+ggc<-data.frame(GeneSources=NULL,Group=NULL,mean=NULL,sd=NULL)
+
+for (i in levels(ss$Group)){
+  sample<-ss[ss$Group==i,"SampleName"]
+  c<-countRes[,colnames(countRes) %in% sample]
+  avr<-apply(c,1,mean)
+  sd<-apply(c,1,sd)
+  groupcount<-cbind(groupcount,avr)
+  colnames(groupcount)[ncol(groupcount)]<-i
+  ggc<-rbind(ggc,data.frame(GeneSources=rownames(countRes),Group=i,mean=avr,sd=sd))
+  
+  }
+
+write.csv(groupcount,"./Results/AverageCountSorcesPerGroup.csv",row.names=FALSE)
+
+pdf("./Results/AverageCountSorcesPerGroup.pdf")
+ggplot(ggc,aes(x=GeneSources,y=mean,fill=Group))+
+  geom_bar(position=position_dodge(), stat="identity")+
+  geom_errorbar(aes(ymin=mean-sd,ymax=mean+sd),width=0.2,position=position_dodge(.9))+
+  xlab("Gene Sources")+
+  ylab("Mean %")+
+  theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))
+dev.off()
+
+
+
+#ploting the pvalue
+pdf("./Results/PvaluePlot.pdf")
+hist(res$pvalue, breaks=100,xlab="p value")
+hist(res$padj, breaks=100,xlab="Adjusted p value")
+dev.off()
+
+# MA-PLOT
+pdf("./Results/MAplot.pdf")
+plotMA(res, main="DESeq2", ylim=c(-2,2)) 
+dev.off()
+#PCA
+countPCA <- count[apply(count > 10, 1, sum)>2.99 & apply(log2(count+0.1), 1, IQR) >= 1.5, ]
+t.log<-log(countPCA)
+df<-t.log[ , ! apply( t.log , 2 , function(x) all(is.na(x)) ) ]
+df <- df[!is.infinite(rowSums(df)),]
+pca<-prcomp(t(df),center = TRUE,scale. = TRUE)
+percentage <- round(pca$sdev / sum(pca$sdev) * 100, 2)
+percentage <- c(paste( "PC1(", as.character(percentage)[1] ,"%)", sep=""),paste( "PC2(", as.character(percentage)[2] ,"%)", sep="")) 
+p1<-cbind(as.data.frame(pca$x[,1:2]),Group=ss$Group)
+rownames(p1)<-ss$SampleName
+
+pdf("./Results/PCAplot_NormalizedFilteredCounts.pdf")
+p<-ggplot(p1,aes(x=p1[,1],y=p1[,2],col=Group))+
+  geom_point()+
+  xlab(percentage[1])+
+  ylab(percentage[2])
+  
+print(p)
+p<-ggplot(p1,aes(x=p1[,1],y=p1[,2],col=Group,label=row.names(p1)))+
+  xlab(percentage[1])+
+  ylab(percentage[2])+
+  geom_text(size=2)
+
+print(p)
+
+dev.off()
+
+pdf("./Results/PCAplot_VST.pdf")
+vsd <- vst(dds, blind=FALSE)
+plotPCA(vsd, intgroup=c("condition"))
+dev.off()
+
+#clustering + heatmap
+
+sampleDists <- dist(t(assay(vsd)))
+
+sampleDistMatrix <- as.matrix(sampleDists)
+rownames(sampleDistMatrix) <- colnames(vsd)
+colnames(sampleDistMatrix) <- NULL
+colors <- colorRampPalette( rev(brewer.pal(9, "Blues")) )(255)
+
+pdf("./Results/ClusteringHeatmap_VST.pdf")
+pheatmap(sampleDistMatrix,
+         clustering_distance_rows=sampleDists,
+         clustering_distance_cols=sampleDists,
+         col=colors)
+dev.off()
+
+
+sampleDists <- dist(t(df))
+
+sampleDistMatrix <- as.matrix(sampleDists)
+rownames(sampleDistMatrix) <- ss$SampleName
+colnames(sampleDistMatrix) <- NULL
+colors <- colorRampPalette( rev(brewer.pal(9, "Blues")) )(255)
+pdf("./Results/ClusteringHeatmap_NormalizedFilteredCounts.pdf")
+pheatmap(sampleDistMatrix,
+         clustering_distance_rows=sampleDists,
+         clustering_distance_cols=sampleDists,
+         col=colors)
+dev.off()
+
+sink("./Results/SessionInfo.txt")
+sessionInfo()
+sink()
+
+
+
+
+
+
